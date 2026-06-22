@@ -16,7 +16,7 @@ jobs:
         image: redis:7
         ports:
           - 6379:6379
-        options: >-
+        options: |
           --health-cmd "redis-cli ping"
           --health-interval 10s
           --health-timeout 5s
@@ -49,5 +49,5 @@ jobs:
         env:
           REDIS_HOST: localhost
           REDIS_PORT: 6379
-          BASE_URL: http://localhost:5000
+          BASE_URL: "http://localhost:5000"
         run: pytest -v --tb=short
