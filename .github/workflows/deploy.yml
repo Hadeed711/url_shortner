@@ -1,0 +1,53 @@
+name: CD Pipeline
+
+on:
+  push:
+    branches: [main]
+
+# Required permissions to push to GHCR
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  # ── Job 1: Run CI first ─────────────────────────────────────
+  test:
+    uses: ./.github/workflows/ci.yml   # reuse the entire CI workflow
+
+  # ── Job 2: Build + push image (only if CI passes) ───────────
+  build-and-push:
+    needs: test                         # waits for test job to pass
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # ── Log in to GitHub Container Registry ─────────────────
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # ── Extract metadata for tags ────────────────────────────
+      - name: Extract image metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=sha,prefix=,format=short
+            type=raw,value=latest
+
+      # ── Build and push the Docker image ──────────────────────
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

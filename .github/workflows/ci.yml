@@ -10,6 +10,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    # STEP 6 — Redis as a service container
     services:
       redis:
         image: redis:7
@@ -33,14 +34,17 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Lint with flake8
-        run: |
-          flake8 app.py shortener.py config.py \
-            --max-line-length=88 \
-            --exclude=venv,__pycache__
+      - name: Verify Redis is running        # optional debug step
+        run: redis-cli -h localhost -p 6379 ping
 
+      # STEP 7 — Lint with flake8
+      - name: Lint with flake8
+        run: flake8 app.py shortener.py config.py
+
+      # STEP 8 — Run all tests
       - name: Run pytest
         env:
           REDIS_HOST: localhost
           REDIS_PORT: 6379
-        run: pytest -v
+          BASE_URL: http://localhost:5000
+        run: pytest -v --tb=short

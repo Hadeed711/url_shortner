@@ -1,41 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>URL Shortener</title>
-  <style>
-    body { font-family: sans-serif; max-width: 520px; margin: 80px auto; padding: 0 20px; }
-    input[type="text"] { width: 100%; padding: 10px; font-size: 15px; box-sizing: border-box; }
-    button { margin-top: 10px; padding: 10px 24px; font-size: 15px; cursor: pointer; }
-    #result { margin-top: 20px; font-size: 15px; }
-    a { color: #0066cc; }
-  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-  <h1>URL Shortener</h1>
+  <div class="wrap">
+    <div class="header">
+      <div class="brand">
+        <div class="logo">US</div>
+        <div>
+          <div class="title">URL Shortener</div>
+          <div class="subtitle">Create clean, shareable links in seconds</div>
+        </div>
+      </div>
+      <div class="muted">Lightweight • Fast • Privacy-friendly</div>
+    </div>
 
-  <input type="text" id="url-input" placeholder="https://example.com/very/long/url">
-  <button onclick="shorten()">Shorten</button>
+    <div class="card hero">
+      <div>
+        <h2 style="margin:0">Shorten any link</h2>
+        <p>Paste a long URL and get a compact, easy-to-share short link. Works for links, articles, files and more.</p>
 
-  <div id="result"></div>
+        <form id="shorten-form" class="form" aria-label="Shorten URL form">
+          <div class="input-group">
+            <input id="url-input" type="text" placeholder="https://example.com/very/long/url" aria-label="URL to shorten">
+            <button id="shorten-btn" class="primary" type="submit">Shorten</button>
+          </div>
+          <div id="result" class="result" aria-live="polite"></div>
+        </form>
 
-  <script>
-    async function shorten() {
-      const url = document.getElementById('url-input').value;
-      const res = await fetch('/shorten', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url })
-      });
-      const data = await res.json();
-      if (data.short_url) {
-        document.getElementById('result').innerHTML =
-          'Short URL: <a href="' + data.short_url + '">' + data.short_url + '</a>';
-      } else {
-        document.getElementById('result').textContent = 'Error: ' + data.error;
-      }
-    }
-  </script>
+        <div class="features">
+          <div class="feature"><strong>Fast</strong><div class="muted">Low latency shortening</div></div>
+          <div class="feature"><strong>Simple</strong><div class="muted">Clean UI and copy actions</div></div>
+          <div class="feature"><strong>Self-hosted</strong><div class="muted">Run on your own infrastructure</div></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card" style="padding:16px">
+          <div style="font-weight:700">How it works</div>
+          <div class="muted" style="margin-top:8px">Enter a URL, click Shorten, then copy or open the generated short link.</div>
+          <div style="margin-top:16px">
+            <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='280' height='160' viewBox='0 0 280 160'><rect rx='8' width='100%' height='100%' fill='%23eef2ff'/><text x='50%' y='52%' dominant-baseline='middle' text-anchor='middle' fill='%23375bff' font-size='14'>Short links preview</text></svg>" alt="preview" style="max-width:100%;border-radius:8px">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">Built with care — deploy anywhere. View tests with the `tests/` folder.</div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>
